@@ -1,0 +1,64 @@
+name: your-app
+
+services:
+    postgres:
+        container_name: postgres-server
+        env_file:
+            - ./secrets.env
+        networks:
+            - yournetwork
+        volumes:
+            - type: volume
+              source: pgdata
+              target: /var/lib/postgresql/data
+            - type: bind
+              source: /path/to/your/code
+              target: /your/target/path
+        ports:
+            - 5432:5432
+        image: postgres:alpine3.19
+    php-fpm:
+        container_name: php-fpm-server
+        env_file:
+            - ./secrets.env
+        networks:
+            - yournetwork
+        ports:
+            - 9000:9000
+        volumes:
+            - type: bind
+              source: /path/to/your/code
+              target: /your/target/path
+            - type: bind
+              source: /path/to/your/custom/php-settings/your-php.ini
+              target: /usr/local/etc/php/conf.d/your-php.ini
+        image: your_repo:your_tag
+    nginx:
+        container_name: nginx-server
+        depends_on:
+          - php-fpm
+          - postgres
+        env_file:
+            - ./secrets.env
+        networks:
+            - yournetwork
+        ports:
+            - 80:80
+        volumes:
+            - type: bind
+              source: /path/to/your/code
+              target: /your/target/path
+            - type: bind
+              source: /path/to/your/custom/nginx-settings/your-nginx.conf
+              target: /etc/nginx/conf.d/your-nginx.conf
+        image: nginx:stable-alpine3.17-slim
+
+networks:
+    yournetwork:
+        external: true
+        name: yournetwork
+
+volumes:
+    pgdata:
+        external: true
+        name: pgdata
