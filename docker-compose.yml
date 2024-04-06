@@ -32,6 +32,7 @@ services:
             - type: bind
               source: /path/to/your/custom/php-settings/your-php.ini
               target: /usr/local/etc/php/conf.d/your-php.ini
+        # For example, https://github.com/vegantriathlete/php-fpm
         image: your_repo:your_tag
     nginx:
         container_name: nginx-server
